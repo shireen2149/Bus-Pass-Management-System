@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Contact Us</title>
+    <style>
+        /* Styling as before */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .contact-container {
+            background: white;
+            padding: 20px;
+            width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="contact-container">
+        <h2>Admin - Contact Us</h2>
+        <form id="contact-form">
+            <label for="page-title">Page Title</label>
+            <input type="text" id="page-title" name="pageTitle" value="Contact Us">
+
+            <label for="page-description">Page Description</label>
+            <textarea id="page-description" name="pageDescription">For any queries, contact us through the details below.</textarea>
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" value="admin@example.com">
+
+            <label for="mobile">Mobile Number</label>
+            <input type="tel" id="mobile" name="mobile" value="876543287">
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from reloading the page
+
+    // Get the new values from the form fields
+    const pageTitle = document.getElementById('page-title').value; // Correct ID here
+    const pageDescription = document.getElementById('page-description').value; // Correct ID here
+    const email = document.getElementById('email').value;
+    const mobile = document.getElementById('mobile').value;
+
+    // Save the changes (e.g., make an API call to save data)
+    fetch('/contact', {  // Endpoint for saving data on the server
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            pageTitle,
+            pageDescription,
+            email,
+            mobile
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Saved changes:', data);
+        alert('Changes saved successfully!');
+    })
+    .catch(error => {
+        console.error('Error saving data:', error);
+        alert('Failed to save changes');
+    });
+});
+    </script>
+</body>
+</html>
+

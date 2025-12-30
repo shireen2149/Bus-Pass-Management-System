@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Bus Pass</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .pass-details {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .pass-details p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .download-btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Download Your Bus Pass</h1>
+    <div class="pass-details" id="passDetails"></div>
+    <a id="downloadLink" class="download-btn" href="#">Download Pass PDF</a>
+    <div id="message"></div>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pdfUrl = urlParams.get('pdfUrl');
+    const passNumber = urlParams.get('passNumber');
+
+    if (!pdfUrl || !passNumber) {
+        showMessage('Error: Missing pass details', 'error');
+        return;
+    }
+
+    // Display pass details
+    const passDetails = document.getElementById('passDetails');
+    passDetails.innerHTML = `
+        <p><strong>Pass Number:</strong> ${decodeURIComponent(passNumber)}</p>
+        <p>Your bus pass has been generated successfully.</p>
+    `;
+
+    // Set download link
+    const downloadLink = document.getElementById('downloadLink');
+    downloadLink.href = decodeURIComponent(pdfUrl);
+
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.display = 'block';
+        messageDiv.className = type;
+        messageDiv.textContent = message;
+    }
+});
+</script>
+</body>
+</html>

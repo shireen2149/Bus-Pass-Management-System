@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Edit About Us</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .about-container {
+            background: white;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            width: 100%;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: none;
+            height: 200px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="about-container">
+        <h2>Admin - Edit About Us</h2>
+        <form id="edit-form">
+            <label for="page-description">Page Description</label>
+            <textarea id="aboutText" name="aboutText" rows="10" cols="50"></textarea>
+            <button type="button" id="saveButton">Save changes</button>
+        </form>
+    </div>
+
+    <script>
+        // Load current About Us content
+        fetch('/about')
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('aboutText').value = data.aboutText || '';
+          })
+          .catch(error => console.error('Error loading About content:', error));
+
+        // Save new About Us content
+        function saveAboutContent() {
+          const newContent = document.getElementById('aboutText').value;
+
+          fetch('/update-about', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ aboutText: newContent }),
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('About content updated:', data);
+            alert('About content updated successfully!');
+          })
+          .catch(error => {
+            console.error('Error updating About content:', error);
+            alert('Failed to update About content.');
+          });
+        }
+
+        // Trigger save function on button click
+        document.getElementById('saveButton').addEventListener('click', saveAboutContent);
+    </script>
+</body>
+</html>

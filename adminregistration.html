@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration - Bus Pass System</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    height:550px;
+    width: 570px;
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+#errorMessage {
+    color: red;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Registration</h2>
+        <form method="POST" action="/admreg" >
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+            <input type="hidden" name="admin_secret" value="admin123"> 
+            <button type="submit">Register</button>
+            <p id="errorMessage"></p>
+        </form>
+    </div>
+
+    <script>
+document.getElementById("adminRegisterForm").addEventListener("submit", function(event) {
+ 
+
+    let name = document.getElementById("name").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+    let password = document.getElementById("password").value.trim();
+    let confirmPassword = document.getElementById("confirmPassword").value.trim();
+    let errorMessage = document.getElementById("errorMessage");
+
+    // Validate email format
+    let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(email)) {
+        errorMessage.textContent = "Invalid email format.";
+        return;
+    }
+
+    // Validate phone number (must be 10 digits)
+    if (!/^\d{10}$/.test(phone)) {
+        errorMessage.textContent = "Phone number must be 10 digits.";
+        return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+        errorMessage.textContent = "Password must be at least 6 characters.";
+        return;
+    }
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        errorMessage.textContent = "Passwords do not match.";
+        return;
+    }
+
+    if (localStorage.getItem("adminRegistered") === "true") {
+        errorMessage.textContent = "An admin has already been registered.";
+        return;
+    }
+
+
+    // If validation passes
+    errorMessage.textContent = "";
+    alert("Admin registered successfully!");
+    // Here, you can send data to the server using fetch()
+
+    window.location.href = '/adm'; 
+});
+</script>
+</body>
+</html>

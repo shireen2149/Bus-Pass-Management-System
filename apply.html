@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Bus Pass</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            margin: 30px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            width: 50%;
+        }
+        h2 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            background: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+        }
+        .qr-code-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .qr-code-container img {
+            width: 150px;
+            height: 150px;
+        }
+        #message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Apply for Bus Pass</h1>
+    </header>
+    <div class="container">
+        <h2>Bus Pass Application Form</h2>
+        <form id="bus-pass-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" name="fname" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" maxlength="10" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))" required>
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" name="dob" id="dob" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" name="address" rows="3" required></textarea>
+            </div>
+            <div>
+                <label for="source">Source</label>
+                <select id="source" name="source">
+                    <option value=""> Select Source</option>
+                    <option value="Narsampet">Narsampet</option>
+                    <option value="Laknepally">Laknepally</option>
+                    <option value="Hanmakonda">Hanmakonda</option>
+                    <option value="Girnibavi">Girnibavi</option>
+                    <option value="Kommala">Kommala</option>
+                     <option value="Dharmaram">Dharmaram</option>
+                    <option value="Warangal">Warangal</option>
+                </select>
+            </div>
+            <div>
+                <label for="destination">Destination</label>
+                <select id="destination" name="destination">
+                    <option value="">Select College</option>
+                    <option value="BITS">Balaji Institue of Technology</option>
+                    <option value="Vaagdevi">Vaagdevi Institute of Technology </option>
+                    <option value="kakatiya">Kakatiya Government Degree & PG College</option>
+                    <option value="vivekananda">Vivekananda Government Degree College</option>
+                    <option value="JITS">Jayamukhi Institute of Technology</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="course">Course</label>
+                <input type="text" id="course" name="course" required>
+            </div>
+            <div class="form-group">
+                <label for="year">Year</label>
+                <input type="text" id="year" name="year" required>
+            </div>
+            <div class="form-group">
+                <label for="renewalPeriod">Renewal period</label>
+                <select id="renewalPeriod" name="renewalPeriod" required>
+                    <option value="">Select Period</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+            <div class="qr-code-container">
+                <label for="qrCode">UPI QR Code</label>
+                <img src="qrcode.jpg" alt="UPI QR Code">
+            </div>
+            <div class="form-group">
+                <label for="payment">Screenshot of your Payment</label>
+                <input type="file" id="payment" name="payment" required>
+            </div>
+            <div class="form-group">
+                <label for="photo">Upload Passport Size Photo</label>
+                <input type="file" id="photo" name="photo" required>
+            </div>
+            <div class="form-group">
+                <label for="aadhar">Upload Aadhar Card</label>
+                <input type="file" id="aadhar" name="aadhar" required>
+            </div>
+            <div class="form-group">
+                <label for="id-proof">Upload ID Proof</label>
+                <input type="file" id="id-proof" name="id-proof" required>
+            </div>
+            <div class="form-group">
+                <label for="bonafide">Upload Bonafide</label>
+                <input type="file" id="bonafide" name="bonafide" required>
+            </div>
+            <div>
+                <label for="amount">Amount (₹)</label>
+                <input type="text" id="amount" name="amount" readonly>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="message"></div>
+    </div>
+    <footer>
+        <p>© 2025 Bus Pass Management System. All Rights Reserved.</p>
+    </footer>
+    <script>
+        const passPrices = {
+            "BITS": {
+                "Warangal": { monthly: 300, quarterly: 550, yearly: 900 },
+                "Laknepally": { monthly: 100, quarterly: 350, yearly: 600 },
+                "Kommala": { monthly: 150, quarterly: 450, yearly: 700 },
+                "Girnibavi": { monthly: 100, quarterly: 250, yearly: 800 },
+                "Dharmaram": { monthly: 180, quarterly: 490, yearly: 850 },
+                "Hanmakonda": { monthly: 350, quarterly: 600, yearly: 1000 },
+                "Narsampet": { monthly: 100, quarterly: 300, yearly: 700 }
+            },
+            "JITS": {
+                "Warangal": { monthly: 350, quarterly: 600, yearly: 950 },
+                "Laknepally": { monthly: 150, quarterly: 400, yearly: 650 },
+                "Kommala": { monthly: 200, quarterly: 500, yearly: 800 },
+                "Girnibavi": { monthly: 200, quarterly: 450, yearly: 800 },
+                "Dharmaram": { monthly: 250, quarterly: 580, yearly: 920 },
+                "Hanmakonda": { monthly: 400, quarterly: 850, yearly: 1100 },
+                "Narsampet": { monthly: 120, quarterly: 350, yearly: 800 }
+            } ,
+
+            "Vaagdevi" : {
+                "Warangal": { monthly: 100, quarterly: 450, yearly: 700 },
+                "Laknepally": { monthly: 200, quarterly: 650, yearly: 850 },
+                "Kommala": { monthly: 300, quarterly: 550, yearly: 800 },
+                "Girnibavi": { monthly: 350, quarterly: 750, yearly: 800 },
+                "Dharmaram": { monthly: 280, quarterly: 490, yearly: 750 },
+                "Hanmakonda": { monthly: 120, quarterly: 400, yearly: 600 },
+                "Narsampet": { monthly: 400, quarterly: 600, yearly: 1000 }
+            },
+            "kakatiya": {
+                "Warangal": { monthly: 100, quarterly: 450, yearly: 700 },
+                "Laknepally": { monthly: 200, quarterly: 650, yearly: 850 },
+                "Kommala": { monthly: 300, quarterly: 550, yearly: 800 },
+                "Girnibavi": { monthly: 350, quarterly: 750, yearly: 800 },
+                "Dharmaram": { monthly: 350, quarterly: 490, yearly: 750 },
+                "Hanmakonda": { monthly: 120, quarterly: 400, yearly: 600 },
+                "Narsampet": { monthly: 400, quarterly: 600, yearly: 1000 }
+            },
+            "vivekananda": {
+                "Warangal": { monthly: 100, quarterly: 450, yearly: 700 },
+                "Laknepally": { monthly: 550, quarterly: 750, yearly: 950 },
+                "Kommala": { monthly: 400, quarterly: 650, yearly: 800 },
+                "Girnibavi": { monthly: 350, quarterly: 750, yearly: 800 },
+                "Dharmaram": { monthly: 280, quarterly: 490, yearly: 750 },
+                "Hanmakonda": { monthly: 120, quarterly: 400, yearly: 600 },
+                "Narsampet": { monthly: 600, quarterly: 800, yearly: 1200 }
+            },
+        };
+
+        function updateAmount() {
+            const source = document.getElementById('source').value;
+            const destination = document.getElementById('destination').value;
+            const renewalPeriod = document.getElementById('renewalPeriod').value;
+            const amountInput = document.getElementById('amount');
+            if (source && destination && renewalPeriod) {
+                const amount = passPrices[destination]?.[source]?.[renewalPeriod];
+                amountInput.value = amount ? `₹${amount}` : '₹0';
+            } else {
+                amountInput.value = '₹0';
+            }
+        }
+
+        document.getElementById('source').addEventListener('change', updateAmount);
+        document.getElementById('destination').addEventListener('change', updateAmount);
+        document.getElementById('renewalPeriod').addEventListener('change', updateAmount);
+        updateAmount();
+
+        document.getElementById('bus-pass-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = '';
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('http://localhost:3001/applyPass', {
+                    method: 'POST',
+                    body: formData
+                });
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('Response data:', result);
+
+                messageDiv.style.color = result.success ? 'green' : 'red';
+                messageDiv.textContent = result.message || (result.success ? 'Application submitted!' : 'Submission failed.');
+
+                if (result.success && result.redirect) {
+                    console.log('Redirecting to:', result.redirect);
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = 'Failed to connect to server: ' + error.message;
+            }
+          
+fetch('/api/apply')
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch applicants');
+        return response.json();
+    })
+    .then(applicants => {
+        console.log('Applicants:', applicants); // Debug: Check the data
+        const tbody = document.getElementById('applicantTable');
+        applicants.forEach(applicant => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${applicant.id}</td>
+                <td>${applicant.fname}</td>
+                <td>${applicant.email}</td>
+                <td><a href="generate-pass.html?id=${applicant.id}">Generate Pass</a></td>
+            `;
+            tbody.appendChild(row);
+        });
+    })
+    .catch(error => console.error('Error fetching applicants:', error));
+
+        });
+    </script>
+</body>
+</html>

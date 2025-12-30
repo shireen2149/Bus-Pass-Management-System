@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Pass</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 40px;
+        }
+    
+        h2 {
+            color: #333;
+        }
+    
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+    
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+    
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    
+        button:hover {
+            background-color: #0056b3;
+        }
+    
+        #results {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+    
+        .pass-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+    
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>Search Pass</h2>
+    <form id="search-pass-form">
+        <label for="passNumber">Pass Number:</label>
+        <input type="text" id="passNumber" name="passNumber" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('search-pass-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const passNumber = document.getElementById('passNumber').value.trim();
+            const resultsDiv = document.getElementById('results');
+            
+            if (!passNumber) {
+                resultsDiv.innerHTML = '<p class="error">Please enter a pass number</p>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<p>Searching...</p>';
+
+            try {
+                const response = await fetch('/search-pass', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ passNumber })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to search');
+                }
+
+                if (data.success) {
+                    if (data.passes.length > 0) {
+                        resultsDiv.innerHTML = '<h3>Pass Details:</h3>';
+                        data.passes.forEach(pass => {
+                            resultsDiv.innerHTML += `
+                                <div class="pass-card">
+                                    <p><strong>Pass Number:</strong> ${pass.passNumber}</p>
+                                    <p><strong>Source:</strong> ${pass.source}</p>
+                                    <p><strong>Destination:</strong> ${pass.destination}</p>
+                                    <p><strong>Expiry Date:</strong> ${new Date(pass.expiryDate).toLocaleDateString()}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        resultsDiv.innerHTML = `<p class="error">No passes found with number: ${passNumber}</p>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<p class="error">${data.message}</p>`;
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsDiv.innerHTML = `<p class="error">Error searching for pass: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

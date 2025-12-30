@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* Add your styles here */
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+
+    <script>
+        // Function to log out and redirect to the home page
+        function logout() {
+            localStorage.removeItem('adminLoggedIn'); // Remove logged-in status
+            window.location.href = '/'; // Redirect to home page (update with your home page path)
+        }
+
+        // Add event listener to logout button
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        // Check if the user is logged in; if not, redirect directly to the home page
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = '/'; // Redirect to home page if not logged in
+        }
+    </script>
+</body>
+</html>

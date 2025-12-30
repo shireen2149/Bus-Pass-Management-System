@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Verify OTP</h2>
+        <form id="otp-form">
+            <input type="hidden" name="email" id="email-input">
+            <input type="text" name="otp" placeholder="Enter OTP" required>
+            <button type="submit">Verify OTP</button>
+        </form>
+    </div>
+
+    <script>
+        // Set the email input value from URL query parameters
+        const emailInput = document.getElementById('email-input');
+        const email = new URLSearchParams(window.location.search).get('email') || '';
+        emailInput.value = email;
+
+        document.getElementById('otp-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.querySelector('input[name="email"]').value;
+            const otp = document.querySelector('input[name="otp"]').value;
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Invalid email address');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3001/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    window.location.href = '/reset-password';
+                } else {
+                    alert(data.error || 'Failed to verify OTP');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while verifying OTP');
+            }
+        });
+    </script>
+</body>
+</html>

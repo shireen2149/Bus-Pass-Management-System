@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Enquiries</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            width: 95%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        .approve-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .approve-btn:hover {
+            background-color: #218838;
+        }
+        .reject-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .reject-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+    <body>
+        <div class="container">
+            <h2>Admin Profile - View Applications and Enquiries</h2>
+    
+            <h3>Applications</h3>
+            <table id="applicationsTable">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Date of Birth</th>
+                        <th>Gender</th>
+                        <th>Address</th>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Course</th>
+                        <th>Year</th>
+                        <th>Renewal Period</th>
+                        <th>Documents</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+    
+            <h3>Renewals</h3>
+            <table id="renewalsTable">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Date of Birth</th>
+                        <th>Gender</th>
+                        <th>Address</th>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Course</th>
+                        <th>Year</th>
+                        <th>Bus Pass Number</th>
+                        <th>Expiry Date</th>
+                        <th>Renewal Period</th>
+                        <th>Documents</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    
+        <script>
+            // Load applications and renewals
+            function loadEnquiries() {
+                // Fetch Applications
+                fetch('http://localhost:3001/admin-enquiries')
+                    .then(response => response.json())
+                    .then(data => {
+                        const appTableBody = document.querySelector('#applicationsTable tbody');
+                        appTableBody.innerHTML = '';
+                        if (data.success && data.applications?.length > 0) {
+                            data.applications.forEach(application => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${application.fname}</td>
+                                    <td>${application.email}</td>
+                                    <td>${application.phone}</td>
+                                    <td>${application.dob}</td>
+                                    <td>${application.gender}</td>
+                                    <td>${application.address}</td>
+                                    <td>${application.source}</td>
+                                    <td>${application.destination}</td>
+                                    <td>${application.course}</td>
+                                    <td>${application.year}</td>
+                                    <td>${application.renewalPeriod}</td>
+                                    
+                                    <td>
+                                        <a href="/Uploads/${application.paymentPath}" target="_blank">Payment</a> |
+                                        <a href="/Uploads/${application.photoPath}" target="_blank">Photo</a> |
+                                        <a href="/Uploads/${application.aadharPath}" target="_blank">Aadhar</a> |
+                                        <a href="/Uploads/${application.idProofPath}" target="_blank">ID Proof</a> |
+                                        <a href="/Uploads/${application.bonafidePath}" target="_blank">Bonafide</a>
+                                    </td>
+                                    <td>
+                                        <button class="approve-btn" onclick="approveApplication(${application.id})">Approve</button>
+                                        <button class="reject-btn" onclick="rejectApplication(${application.id})">Reject</button>
+                                    </td>
+                                `;
+                                appTableBody.appendChild(row);
+                            });
+                        } else {
+                            appTableBody.innerHTML = '<tr><td colspan="14">No applications found.</td></tr>';
+                        }
+                    })
+                    .catch(err => console.error('Error fetching applications:', err));
+    
+                // Fetch Renewals
+                fetch('http://localhost:3001/admin-renewal-enquiries')
+                    .then(response => response.json())
+                    .then(data => {
+                        const renewalTableBody = document.querySelector('#renewalsTable tbody');
+                        renewalTableBody.innerHTML = '';
+                        if (data.success && data.applications?.length > 0) {
+                            data.applications.forEach(renewal => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${renewal.fname}</td>
+                                    <td>${renewal.email}</td>
+                                    <td>${renewal.phone}</td>
+                                    <td>${renewal.dob}</td>
+                                    <td>${renewal.gender}</td>
+                                    <td>${renewal.address}</td>
+                                    <td>${renewal.source}</td>
+                                    <td>${renewal.destination}</td>
+                                    <td>${renewal.course}</td>
+                                    <td>${renewal.year}</td>
+                                    <td>${renewal.passNumber}</td>
+                                    <td>${renewal.expiryDate}</td>
+                                    <td>${renewal.renewalPeriod}</td>
+                                  
+                                    <td>
+                                        <a href="/Uploads/${renewal.paymentPath}" target="_blank">Payment</a> |
+                                        <a href="/Uploads/${renewal.photoPath}" target="_blank">Photo</a> |
+                                        <a href="/Uploads/${renewal.aadharPath}" target="_blank">Aadhar</a> |
+                                        <a href="/Uploads/${renewal.idProofPath}" target="_blank">ID Proof</a> |
+                                        <a href="/Uploads/${renewal.bonafidePath}" target="_blank">Bonafide</a>
+                                    </td>
+                                    <td>
+                                        <button class="approve-btn" onclick="approveRenewal(${renewal.id})">Approve</button>
+                                        <button class="reject-btn" onclick="rejectRenewal(${renewal.id})">Reject</button>
+                                    </td>
+                                `;
+                                renewalTableBody.appendChild(row);
+                            });
+                        } else {
+                            renewalTableBody.innerHTML = '<tr><td colspan="15">No renewals found.</td></tr>';
+                        }
+                    })
+                    .catch(err => console.error('Error fetching renewals:', err));
+            }
+    
+            // Approve Application
+            async function approveApplication(id) {
+                try {
+                    const response = await fetch(`http://localhost:3001/accept-application`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id })
+                    });
+                    if (!response.ok) throw new Error('Failed to approve application');
+                    alert('Application approved!');
+                    window.location.href = `/manage-pass?applicationId=${id}`;
+                } catch (error) {
+                    console.error('Approve application error:', error);
+                    alert('Error approving application');
+                }
+            }
+ // Reject Application
+async function rejectApplication(id) {
+    console.log('Attempting to reject application with ID:', id);
+    if (confirm('Are you sure you want to reject and delete this application?')) {
+        try {
+            const rejectBtn = document.querySelector(`#applicationsTable button[onclick="rejectApplication(${id})"]`);
+            rejectBtn.disabled = true;
+            rejectBtn.textContent = 'Rejecting...';
+            const response = await fetch(`http://localhost:3001/reject-application`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            console.log('Response status:', response.status);
+            const data = await response.json();
+            console.log('Response data:', data);
+            if (!response.ok) {
+                throw new Error(data.message || `Failed to reject application (Status: ${response.status})`);
+            }
+            alert(data.message || 'Application rejected and deleted');
+            loadEnquiries();
+        } catch (error) {
+            console.error('Reject application error:', error);
+            alert(`Error rejecting application: ${error.message}`);
+        } finally {
+            rejectBtn.disabled = false;
+            rejectBtn.textContent = 'Reject';
+        }
+    }
+}
+            async function approveRenewal(id) {
+    try {
+        const response = await fetch(`http://localhost:3001/admin/approve-renewal/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to approve renewal');
+        }
+
+        alert('Renewal approved!');
+        window.location.href = `/manage-pass?renewalId=${id}`;
+    } catch (error) {
+        console.error('Approve renewal error:', error.message);
+        alert(`Error approving renewal: ${error.message}`);
+    }
+}
+            async function rejectRenewal(id) {
+               if (confirm('Are you sure you want to reject and delete this renewal?')) {
+                    try {
+                       const response = await fetch(`http://localhost:3001/admin/reject-renewal/${id}`, {
+                       method: 'POST', // Change to POST to match backend
+                       headers: { 'Content-Type': 'application/json' },
+                // No body needed since id is in the URL
+            });
+
+            const data = await response.json(); // Parse JSON response
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to reject renewal');
+            }
+
+            alert('Renewal rejected and deleted');
+            loadEnquiries(); // Refresh table
+        } catch (error) {
+            console.error('Reject renewal error:', error.message);
+            alert(`Error rejecting renewal: ${error.message}`);
+        }
+    }
+}
+    
+            // Initial load
+            loadEnquiries();
+        </script>
+    </body>
+</html>

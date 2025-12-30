@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Bus Pass</title>
+    <style>
+        body { 
+        font-family: Arial, sans-serif; 
+        max-width: 800px; 
+        margin: 0 auto; 
+        padding: 20px; 
+        background-color: #f4f4f4; 
+        }
+        h1 { 
+        text-align: center; 
+        color: #333; 
+        }
+        form { 
+        background: #fff; 
+        padding: 20px; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+        }
+        .form-group { 
+        margin-bottom: 15px; 
+        }
+        label { 
+        display: block; 
+        margin-bottom: 5px; 
+        font-weight: bold; 
+        color: #555; 
+        }
+        input, select { 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid #ddd; 
+        border-radius: 4px; 
+        font-size: 16px; 
+        }
+        input:focus, select:focus { 
+        border-color: #007bff; 
+        outline: none; 
+        }
+        button { 
+        background-color: #007bff; 
+        color: #fff; 
+        padding: 10px 20px; 
+        border: none; 
+        border-radius: 4px; 
+        cursor: pointer; 
+        font-size: 16px; 
+        display: block; 
+        margin: 20px auto; 
+        }
+        button:hover { 
+        background-color: #0056b3; 
+        }
+        #message { 
+        margin-top: 20px; 
+        padding: 10px; 
+        border-radius: 4px; 
+        display: none; 
+        }
+        .success { 
+        background-color: #d4edda; 
+        color: #155724; 
+        }
+        .error { 
+        background-color: #f8d7da; 
+        color: #721c24; 
+        }
+        #photoStatus { 
+        margin-top: 5px; 
+        font-size: 14px; 
+        color: #555; 
+        }
+        #photoPreview { 
+        max-width: 150px; 
+        max-height: 150px; 
+        margin-top: 10px; 
+        display: none; 
+        border: 1px solid #ddd; 
+        border-radius: 4px; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Bus Pass</h1>
+    <form id="passForm" action="/admin/pass-generate" method="POST">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="passNumber">Pass Number</label>
+            <input type="text" id="passNumber" name="passNumber" required>
+        </div>
+        <div class="form-group">
+            <label for="fname">Full Name</label>
+            <input type="text" id="fname" name="fname" required>
+        </div>
+        <div class="form-group">
+            <label for="source">Source</label>
+            <input type="text" id="source" name="source" required>
+        </div>
+        <div class="form-group">
+            <label for="destination">Destination</label>
+            <input type="text" id="destination" name="destination" required>
+        </div>
+        <div class="form-group">
+            <label for="course">Course</label>
+            <input type="text" id="course" name="course" required>
+        </div>
+        <div class="form-group">
+            <label for="year">Year</label>
+            <input type="text" id="year" name="year" required>
+        </div>
+        <div class="form-group">
+            <label for="renewalPeriod">Pass Type</label>
+            <select id="renewalPeriod" name="renewalPeriod" required>
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="expiryDate">Expiry Date</label>
+            <input type="date" id="expiryDate" name="expiryDate" required>
+        </div>
+        <div class="form-group">
+            <label>Passport Photo</label>
+            <img id="photoPreview" src="" alt="Photo Preview">
+            <div id="photoStatus"></div>
+            <input type="hidden" id="photoPath" name="photoPath" required>
+        </div>
+        <button type="submit">Generate Pass</button>
+    </form>
+    <div id="message"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const applicantEmail = urlParams.get('email');
+            if (!applicantEmail) {
+                showMessage('Error: No email provided in URL', 'error');
+                return;
+            }
+
+            async function populateForm(data) {
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('passNumber').value = data.passNumber || generatePassNumber();
+                document.getElementById('fname').value = data.fname || '';
+                document.getElementById('source').value = data.source || '';
+                document.getElementById('destination').value = data.destination || '';
+                document.getElementById('course').value = data.course || '';
+                document.getElementById('year').value = data.year || '';
+                document.getElementById('renewalPeriod').value = ['monthly', 'quarterly', 'yearly'].includes(data.renewalPeriod?.toLowerCase()) ? data.renewalPeriod.toLowerCase() : 'monthly';
+                document.getElementById('expiryDate').value = isValidDate(data.expiryDate) ? data.expiryDate : getDefaultExpiryDate(data.renewalPeriod);
+                document.getElementById('photoPath').value = data.photoPath || '';
+
+                const photoStatus = document.getElementById('photoStatus');
+                const photoPreview = document.getElementById('photoPreview');
+                if (data.photoPath) {
+                    try {
+                        const img = new Image();
+                        img.src = `/uploads/${data.photoPath}`;
+                        img.onload = () => {
+                            console.log(`Photo loaded: /Uploads/${data.photoPath}, Dimensions: ${img.width}x${img.height}`);
+                            photoPreview.src = `/uploads/${data.photoPath}`;
+                            photoPreview.style.display = 'block';
+                            photoStatus.textContent = `Using applicant’s photo: ${data.photoPath}`;
+                        };
+                        img.onerror = () => {
+                            console.error(`Error loading photo: /Uploads/${data.photoPath}`);
+                            photoStatus.textContent = `Error loading applicant’s photo: ${data.photoPath}`;
+                            document.getElementById('photoPath').value = '';
+                            showMessage('Error: Applicant’s photo not found', 'error');
+                        };
+                    } catch (error) {
+                        console.error(`Error accessing photo: /Uploads/${data.photoPath}, Error: ${error.message}`);
+                        photoStatus.textContent = `Error accessing applicant’s photo: ${data.photoPath}`;
+                        document.getElementById('photoPath').value = '';
+                        showMessage('Error: Applicant’s photo not accessible', 'error');
+                    }
+                } else {
+                    photoStatus.textContent = 'No photo provided by applicant';
+                    document.getElementById('photoPath').value = '';
+                    showMessage('Error: Applicant must provide a photo', 'error');
+                }
+            }
+
+            fetch(`/api/applicants/by-email/${encodeURIComponent(applicantEmail)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) throw new Error('No applicant data returned');
+                    const mergedData = {
+                        email: data.email || applicantEmail,
+                        passNumber: data.passNumber || generatePassNumber(),
+                        fname: data.fname || '',
+                        source: data.source || '',
+                        destination: data.destination || '',
+                        course: data.course || '',
+                        year: data.year || '',
+                        renewalPeriod: data.renewalPeriod?.toLowerCase() || 'monthly',
+                        expiryDate: data.expiryDate || getDefaultExpiryDate(data.renewalPeriod || 'monthly'),
+                        photoPath: data.photoPath || ''
+                    };
+                    populateForm(mergedData);
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    showMessage(`Error fetching applicant data: ${error.message}`, 'error');
+                    populateForm({ email: applicantEmail, photoPath: '' });
+                });
+
+            document.getElementById('passForm').addEventListener('submit', async e => {
+                e.preventDefault();
+                const form = document.getElementById('passForm');
+                const formData = new FormData(form);
+
+                console.log('Raw form input values:');
+                console.log('email:', document.getElementById('email').value);
+                console.log('passNumber:', document.getElementById('passNumber').value);
+                console.log('fname:', document.getElementById('fname').value);
+                console.log('source:', document.getElementById('source').value);
+                console.log('destination:', document.getElementById('destination').value);
+                console.log('course:', document.getElementById('course').value);
+                console.log('year:', document.getElementById('year').value);
+                console.log('renewalPeriod:', document.getElementById('renewalPeriod').value);
+                console.log('expiryDate:', document.getElementById('expiryDate').value);
+                console.log('photoPath:', document.getElementById('photoPath').value);
+
+                console.log('FormData contents:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}: ${value}`);
+                }
+
+                const jsonData = {
+                    email: formData.get('email'),
+                    passNumber: formData.get('passNumber'),
+                    fname: formData.get('fname'),
+                    source: formData.get('source'),
+                    destination: formData.get('destination'),
+                    course: formData.get('course'),
+                    year: formData.get('year'),
+                    renewalPeriod: formData.get('renewalPeriod')?.toLowerCase(),
+                    expiryDate: formData.get('expiryDate'),
+                    photoPath: formData.get('photoPath') || ''
+                };
+                console.log('JSON data:', jsonData);
+
+                if (!jsonData.email || !jsonData.passNumber || !jsonData.fname || !jsonData.source || !jsonData.destination || !jsonData.course || !jsonData.year || !jsonData.renewalPeriod || !jsonData.expiryDate || !jsonData.photoPath) {
+                    showMessage('Error: All fields and photo are required', 'error');
+                    return;
+                }
+
+                if (!['monthly', 'quarterly', 'yearly'].includes(jsonData.renewalPeriod)) {
+                    showMessage('Error: Invalid pass type', 'error');
+                    return;
+                }
+
+                if (!isValidDate(jsonData.expiryDate)) {
+                    showMessage('Error: Invalid expiry date', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/admin/pass-generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(jsonData)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`Server returned ${response.status}: ${errorData.error || 'Unknown error'}`);
+                    }
+
+                    const result = await response.json();
+                    showMessage('Pass generated successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/manage-pass';
+                    }, 2000);
+                } catch (error) {
+                    console.error('Submit error:', error);
+                    showMessage(`Error generating pass: ${error.message}`, 'error');
+                }
+            });
+
+            function showMessage(message, type) {
+                const messageDiv = document.getElementById('message');
+                messageDiv.style.display = 'block';
+                messageDiv.className = type;
+                messageDiv.textContent = message;
+            }
+
+            function getDefaultExpiryDate(renewalPeriod) {
+                const today = new Date();
+                let expiry = new Date(today);
+                if (renewalPeriod === 'monthly') expiry.setMonth(today.getMonth() + 1);
+                else if (renewalPeriod === 'quarterly') expiry.setMonth(today.getMonth() + 3);
+                else if (renewalPeriod === 'yearly') expiry.setFullYear(today.getFullYear() + 1);
+                return expiry.toISOString().split('T')[0];
+            }
+
+            function isValidDate(dateStr) {
+                const date = new Date(dateStr);
+                return !isNaN(date.getTime()) && dateStr.match(/^\d{4}-\d{2}-\d{2}$/);
+            }
+        });
+    </script>
+</body>
+</html>

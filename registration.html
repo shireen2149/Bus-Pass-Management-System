@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bus Pass System - Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #004080;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        h2 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+        form {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color:#004080;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .error {
+            color: #d32f2f;
+        }
+        .success {
+            color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <h2>Bus Pass System - Register</h2>
+    <form id="reg-form">
+        <label for="fname">Full Name:</label>
+        <input type="text" id="fname" name="fname" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" maxlength="10" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Register</button>
+        <div id="message"></div>
+    </form>
+
+    
+        <script>
+        let isSubmitting = false;
+        document.getElementById('reg-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isSubmitting) return;
+            isSubmitting = true;
+
+            const messageDiv = document.getElementById('message');
+            const submitButton = e.target.querySelector('button');
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Registering...';
+            messageDiv.textContent = '';
+
+            // Client-side validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(data.email)) {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Error: Invalid email format';
+                submitButton.disabled = false;
+                submitButton.textContent = 'Register';
+                isSubmitting = false;
+                return;
+            }
+            if (data.phone.length !== 10 || isNaN(data.phone)) {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Error: Phone number must be 10 digits';
+                submitButton.disabled = false;
+                submitButton.textContent = 'Register';
+                isSubmitting = false;
+                return;
+            }
+            if (data.password.length < 8) {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Error: Password must be at least 8 characters long';
+                submitButton.disabled = false;
+                submitButton.textContent = 'Register';
+                isSubmitting = false;
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3001/reg', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    messageDiv.className = 'success';
+                    messageDiv.textContent = result.success || 'Registration successful';
+                    setTimeout(() => {
+                        window.location.href = '/one';
+                    }, 2000);
+                } else {
+                    messageDiv.className = 'error';
+                    messageDiv.textContent = result.error || 'Registration failed';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Error connecting to server';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Register';
+                isSubmitting = false;
+            }
+        });
+    </script>
+</body>
+</html>

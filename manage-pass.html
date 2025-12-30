@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Pass - Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Approved Bus Pass Applications</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Date of Birth</th>
+                <th>Gender</th>
+                <th>Address</th>
+                <th>Source</th>
+                <th>Destination</th>
+                <th>Course</th>
+                <th>Year</th>
+                <th>Pass Number</th>
+                <th>Expiry Date</th>
+                <th>Renewal Period</th>
+                <th>application Type</th>
+                <th>Passport Size Photo</th>
+                <th>Documents</th>
+            </tr>
+        </thead>
+        <tbody id="managePassTable"></tbody>
+    </table>
+
+    <script>
+async function fetchPasses() {
+    try {
+        const res = await fetch('http://localhost:3001/api/manage-pass?status=approved', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status} ${res.statusText}`);
+        }
+        const data = await res.json();
+        const tableBody = document.getElementById('managePassTable');
+
+        if (data.success && data.passes && data.passes.length > 0) {
+            tableBody.innerHTML = '';
+            data.passes.forEach(app => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${app.fname || ''}</td>
+                    <td>${app.email || ''}</td>
+                    <td>${app.phone || ''}</td>
+                    <td>${app.dob || ''}</td>
+                    <td>${app.gender || ''}</td>
+                    <td>${app.address || ''}</td>
+                    <td>${app.source || ''}</td>
+                    <td>${app.destination || ''}</td>
+                    <td>${app.course || ''}</td>
+                    <td>${app.year || ''}</td>
+                    <td>${app.passNumber || ''}</td>
+                    <td>${app.expiryDate || ''}</td>
+                    <td>${app.renewalPeriod || ''}</td>
+                    <td>${app.application_type || ''}</td>
+                    <td>
+                        ${app.photoPath ? `<a href="/Uploads/${app.photoPath}" target="_blank">Photo</a>` : ''}
+                    </td>
+                    <td>
+                        <button class="generate-btn" 
+                                onclick="generatePass('${app.email}')"
+                                ${app.status === 'generated' ? 'disabled' : ''}>
+                            ${app.status === 'generated' ? 'Generated' : 'Generate Pass'}
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="16">No approved passes found.</td></tr>';
+        }
+    } catch (err) {
+        console.error('Error fetching manage pass:', err);
+        const tableBody = document.getElementById('managePassTable');
+        tableBody.innerHTML = `<tr><td colspan="16">Error loading passes: ${err.message}. Please check if the server is running at http://localhost:3001 and the database is accessible.</td></tr>`;
+    }
+}
+
+function generatePass(email) {
+    // Open pass-generator route in a new tab
+    window.open(`/pass-generator?email=${encodeURIComponent(email)}`, '_blank');
+}
+
+fetchPasses();
+</script>
+</body>
+</html>

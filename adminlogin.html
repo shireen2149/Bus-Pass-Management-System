@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Bus Pass System</title>
+    <style>
+      /* Global Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom, #004080, #007bff);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    
+    /* Container */
+    .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 350px;
+    }
+    
+    /* Heading */
+    h2 {
+        color: #004080;
+        margin-bottom: 20px;
+    }
+    
+    /* Form Styling */
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    label {
+        font-size: 16px;
+        color: #004080;
+        text-align: left;
+        margin-bottom: 5px;
+    }
+    
+    input {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #004080;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    
+    button {
+        background: #004080;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    button:hover {
+        background: #002f5e;
+    }
+    
+    /* Error Message */
+    .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+        min-height: 20px; /* Reserve space to prevent layout shift */
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Login</h2>
+        <form id="adminLoginForm">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="Enter your email">
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="Enter your password">
+
+            <button type="submit">Login</button>
+            <p class="error-message" id="errorMessage"></p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Clear previous error message
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = '';
+
+    // Get form values
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // Send login request
+    fetch('/admin-login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Expect JSON response
+        })
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/two'; // Redirect to admin.html
+            } else {
+                errorMessage.textContent = data.message || 'Invalid login'; // Display server-provided or default error
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            errorMessage.textContent = 'An error occurred. Please try again.';
+        });
+});
+    </script>
+</body>
+</html>

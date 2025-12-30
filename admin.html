@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Pass MS - Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #c8d0d8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background: #0056b3;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+        }
+        .sidebar h2 {
+            text-align: center;
+        }
+        .sidebar .profile {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .menu {
+            list-style: none;
+            padding: 0;
+        }
+        .menu li {
+            padding: 10px;
+            text-align: left;
+        }
+        .menu li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 8px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .menu li a:hover {
+            background-color: #004080;
+        }
+        .dropdown-menu {
+            display: none;
+            list-style: none;
+            padding-left: 15px;
+            background-color: #0056b3;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: white;
+        }
+        .dropdown-menu a:hover {
+            background-color: #004080;
+        }
+        .arrow {
+            float: right;
+        }
+        .main-content {
+            margin-left: 270px;
+            padding: 20px;
+            color: white;
+            flex-grow: 1;
+        }
+        .center {
+            text-align: center;
+        }
+        .dashboard-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+            width: 200px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .card i {
+            font-size: 30px;
+        }
+        .card.red {
+            background: #ff4d4d;
+            color: white;
+        }
+        .card.yellow {
+            background: #ffcc00;
+            color: black;
+        }
+        .card.blue {
+            background: #0056b3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Bus Pass MS</h2>
+        <div class="profile">
+            <p><strong><a href="/three">Admin</a></strong></p>
+            <span class="status">● Online</span>
+        </div>
+        <ul class="menu">
+            <li><a href="/two">Dashboard</a></li>
+            <li class="dropdown">
+                <a href="#" class="drop-btn">Passes <span class="arrow">▾</span></a>
+                <ul class="dropdown-menu passes-menu">
+                    <li><a href="/apply3">Add Pass</a></li>
+                    <li><a href="/manage-pass">Manage Pass</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="drop-btn">Pages <span class="arrow">▾</span></a>
+                <ul class="dropdown-menu pages-menu">
+                    <li><a href="/13">About Us</a></li>
+                    <li><a href="/14">Contact Us</a></li>
+                </ul>
+            </li>
+            <li><a href="/11">Enquiry</a></li>
+            <li><a href="/ten">Search</a></li>
+            <li><a href="/adminlog">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h2 class="center">Dashboard</h2>
+        <div class="dashboard-cards">
+            <div class="card yellow">
+                <i class="icon">📋</i>
+                <p><strong><span id="total-pass-count">0</span></strong> Total Applications</p>
+            </div>
+            <div class="card yellow">
+                <i class="icon">✎</i>
+                <p><strong id="yesterday-pass-count">0</strong> Pass Created Yesterday</p>
+            </div>
+            <div class="card blue">
+                <i class="icon">✎</i>
+                <p><strong id="last7days-pass-count">0</strong> Pass Created in Seven Days</p>
+            </div>
+            <div class="card red">
+                <i class="icon">✏</i>
+                <p><strong id="today-pass-count">0</strong> Pass Created Today</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(dropdown => {
+                const dropBtn = dropdown.querySelector('.drop-btn');
+                const dropMenu = dropdown.querySelector('.dropdown-menu');
+                
+                if (dropBtn && dropMenu) {
+                    dropBtn.addEventListener('click', (event) => {
+                      
+                        // Close other dropdowns
+                        dropdowns.forEach(other => {
+                            const otherMenu = other.querySelector('.dropdown-menu');
+                            if (other !== dropdown && otherMenu.style.display === 'block') {
+                                otherMenu.style.display = 'none';
+                            }
+                        });
+                        // Toggle current dropdown
+                        dropMenu.style.display = dropMenu.style.display === 'block' ? 'none' : 'block';
+                    });
+                } else {
+                    console.error('Dropdown elements not found:', { dropBtn, dropMenu });
+                }
+            });
+
+           const fetchTotalPass = async () => {
+    try {
+        const response = await fetch('http://localhost:3001/admin-total-pass');
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('total-pass-count').textContent = data.total;
+        } else {
+            document.getElementById('total-pass-count').textContent = 'Error';
+            console.error('Fetch success false:', data.message);
+        }
+    } catch (error) {
+        console.error('Error fetching total passes:', error.message);
+        document.getElementById('total-pass-count').textContent = 'Error';
+    }
+};
+        const fetchTodayPass = async () => {
+    try {
+        const response = await fetch('http://localhost:3001/admin-today-pass');
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('today-pass-count').textContent = data.total;
+        } else {
+            document.getElementById('today-pass-count').textContent = 'Error';
+            console.error('Fetch success false:', data.message);
+        }
+    } catch (error) {
+        console.error('Error fetching today\'s passes:', error.message);
+        document.getElementById('today-pass-count').textContent = 'Error';
+    }
+};
+const fetchYesterdayPass = async () => {
+    try {
+        const response = await fetch('http://localhost:3001/admin-yesterday-pass');
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('yesterday-pass-count').textContent = data.total;
+        } else {
+            document.getElementById('yesterday-pass-count').textContent = 'Error';
+            console.error('Fetch success false:', data.message);
+        }
+    } catch (error) {
+        console.error('Error fetching yesterday\'s passes:', error.message);
+        document.getElementById('yesterday-pass-count').textContent = 'Error';
+    }
+};
+ const fetchLast7DaysPass = async () => {
+    try {
+        const response = await fetch('http://localhost:3001/admin-last7days-pass');
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('last7days-pass-count').textContent = data.total;
+        } else {
+            document.getElementById('last7days-pass-count').textContent = 'Error';
+            console.error('Fetch success false:', data.message);
+        }
+    } catch (error) {
+        console.error('Error fetching last 7 days\' passes:', error.message);
+        document.getElementById('last7days-pass-count').textContent = 'Error';
+    }
+};
+
+            fetchTotalPass();
+            fetchTodayPass();
+            fetchYesterdayPass();
+            fetchLast7DaysPass();
+        });
+    </script>
+</body>
+</html>
